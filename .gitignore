@@ -1,1 +1,8 @@
 *.txt
+*.bin
+*.d
+*.eep
+*.elf
+*.hex
+*.o
+
