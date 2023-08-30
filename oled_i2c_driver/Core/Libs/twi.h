@@ -12,6 +12,9 @@
 #include <inttypes.h>
 
 void i2c_init(uint8_t address);
-uint8_t i2c_write(const uint8_t* data_buffer, int data_size);
+uint8_t i2c_write_array(const uint8_t* data_buffer, int data_size);
+void i2c_start();
+void i2c_write(uint8_t byte);
+void i2c_stop();
 
 #endif

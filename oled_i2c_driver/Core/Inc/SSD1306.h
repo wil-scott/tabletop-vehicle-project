@@ -10,15 +10,17 @@
 
 /* include HAL for ATMEGA4809 */
 #include <avr/io.h>
-#include <twi.h>
+#include "../Libs/twi.h"
  
 /*
  * DEFINES
  */
-#define SSD1306_I2C_ADDR			0x78 /*Default addr is 0x3C, << 1 is 0x78 */
+#define SSD1306_I2C_ADDR	0x78 /*Default addr is 0x3C, << 1 is 0x78 */
  
-#define HEIGHT 32
-#define WIDTH 128
+#define HEIGHT 		32
+#define WIDTH 		128
+#define MIN_PAGE 	0
+#define MAX_PAGE 	3
 
  
 /* define control bytes */
@@ -33,40 +35,69 @@
 #define SINGLE_DATA_BYTE	0xC0
 
 /*
- * Define Command Bytes
+ * Fundamental Commands
  */
 
-#define SSD1306_CONTRAST_ID			0x7F
-#define SSD1306_NORMAL_DISPLAY_ID	0xA6
-#define SSD1306_DISPLAY_STATUS_UD	0xAE
-
-	const uint8_t config_buff[19] = { 0x00, 0xA8, 0x3F, 0xD3, 0x00, 0x40, 0xA1, 0xC0, 0xDA, 0x02, 0x81, 0x7F, 0xA4, 0xA6, 0xD5, 0x80, 0x8D, 0x14, 0xAF };
-
-
+#define SSD_SET_CONTRAST			0x80 //0x7F
+#define SSD_DISPLAY_RAM				0xA4
+#define SSD_DISPLAY_NO_RAM			0xA5
+#define SSD_DISPLAY_NORMAL			0xA6
+#define SSD_DISPLAY_INVERSE			0xA7
+#define SSD_DISPLAY_OFF				0xAE
+#define SSD_DISPLAY_ON				0xAF
 
 /*
- * OLED STRUCT
+ * Scrolling Commands
  */
-typedef struct {
-	/*may require an address struct of some kind to hold the i2c addr/object*/
-	/*hold displayed data on top, bottom row - cap to 10 chars for now*/
-	int cursor_location = 0;
-	char top_row[11] = "";
-	char bottom_row[11] = "";
-} OLED;
- 
+#define SSD_DEACT_SCROLL	0x2E
+
+/*
+ * Addressing Commands
+ */
+#define SSD_SET_ADDR_MODE	0x20 // follow w/ 0x02 for page mode
+#define SSD_SET_PAGE_ADDR	0xB0 // AND w/ valid addr(0, 1, 2, 3)
+
+/*
+ * Hardware Commands
+ */
+#define SDD_DISPLAY_START_LINE	0x40
+#define SSD_SET_SEGMENT_REMAP	0xA0 // A0 is reset, A1 = col 127 is col0
+#define SSD_SET_MUX_RATIO 		0xA8 // followed by 0x1F (rows - 1 = 31)
+#define SSD_COM_SCAN_DIR		0xC0 // C0 is normal, C8 remapped
+#define SSD_SET_DISPLAY_OFFSET 	0xD3 // followed by 0x00 for no offset
+#define SSD_SET_COM_PINS		0xDA // followed by 0x02 for 128x32 oled
+
+/*
+ * Timing/Driving Commands
+ */
+#define SSD_SET_DISPLAY_CLK		0xD5 //followed by 0x80 for reset
+#define SSD_SET_PRECHRG			0xD9 //followed by 0x22 for reset 
+#define SSD_SET_VCOM			0xDB //followed by 0x20 for reset
+
+/*
+ * Charge Pump Commands
+ */
+#define SSD_CHARGE_PUMP			0x8D //followed by 0x14 to enable
+
 /*
  * INITIALISATION
  */
-uint8_t SSD1306_Init( OLED *dev );
+void SSD1306_init( uint8_t address );
+void SSD1306_config_addressing();
+void SSD1306_clear_display();
+
+/*
+ * MAIN FUNCTIONALITY
+ */
+void display_string(char* string, int str_len, uint8_t page );
+void SSD1306_scroll_off();
 
 /*
  * LOW-LEVEL FUNCTIONS
  */
-uint8_t SSD1306_ReadRegister( OLED *dev, uint8_t reg, uint8_t *data );
-uint8_t SSD1306_ReadRegister( OLED *dev, uint8_t reg, uint8_t *data, uint8_t length );
+void SSD1306_WriteCommand( uint8_t byte );
+void SSD1306_WriteData( uint8_t byte );
 
-uint8_t SSD1306_WriteRegister( OLED *dev, uint8_t reg, uint8_t *data );
 
 #endif
 

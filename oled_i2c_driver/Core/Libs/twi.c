@@ -106,7 +106,7 @@ void i2c_init(uint8_t address)
 	TWI_interrupt_init();
 }
 
-uint8_t i2c_write(const uint8_t* data_buffer, int data_size)
+uint8_t i2c_write_array(const uint8_t* data_buffer, int data_size)
 {
 	TWI_Start();
 	
@@ -117,6 +117,21 @@ uint8_t i2c_write(const uint8_t* data_buffer, int data_size)
 	_delay_ms(25);
 	TWI_Stop();
 	return 0x00;
+}
+
+void i2c_start()
+{
+	TWI_Start();
+}
+
+void i2c_write(uint8_t byte)
+{
+	TWI_Write(byte);
+}
+
+void i2c_stop()
+{
+	TWI_Stop();
 }
 
 
