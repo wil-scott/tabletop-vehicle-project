@@ -55,7 +55,16 @@
  * Addressing Commands
  */
 #define SSD_SET_ADDR_MODE	0x20 // follow w/ 0x02 for page mode
-#define SSD_SET_PAGE_ADDR	0xB0 // AND w/ valid addr(0, 1, 2, 3)
+#define SSD_HORIZ_MODE		0x00
+
+#define SSD_PAGE_MODE		0x02
+#define SSD_SET_PAGE_START	0xB0 // AND addr(0, 1, 2, 3) - (Page Mode)
+
+#define SSD_COL_ADDR		0x21 //follow with col start/end addr (0-127d)
+#define SSD_PAGE_ADDR		0x22 //follow with page start/end addr (0-3d)
+
+
+
 
 /*
  * Hardware Commands
@@ -89,7 +98,7 @@ void SSD1306_clear_display();
 /*
  * MAIN FUNCTIONALITY
  */
-void display_string(char* string, int str_len, uint8_t page );
+void display_string(char* string, int str_len, uint8_t page, uint8_t col );
 void SSD1306_scroll_off();
 
 /*
