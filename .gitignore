@@ -7,4 +7,5 @@
 *.o
 *.a
 *.map
+testbench/
 
