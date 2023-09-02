@@ -26,13 +26,10 @@ enum { FLUSH = 0x08, NACK = 0x04, STOP = 0x03, READ = 0x02, ACK = 0x0 };
 
 /*
  * Initializes the TWI module on the ATMEGA4809 as Host
+ * NOTE: PORT A PIN 2 + 3 (TWI Module) must already be configured for output/r-w
  */
 void TWI_Init(void)
 {
-	//enable TWI pins for read/write -> may relocate to separate config file in future
-	PORTA.DIR |= PIN2_bm;
-	PORTA.DIR |= PIN3_bm;
-	
 	// HOST INIT
 	// Initialize host baud rate
 	TWI0.MBAUD = 76; // CPU 16,000,000hz and TWI 100,000hz
@@ -51,7 +48,7 @@ void TWI_Init(void)
 void TWI_interrupt_init(void)
 {
 	TWI0.MCTRLA |= 0xC0; // 0b1100000 -> Turns on RIF and WIF interrupt/flags
-	//sei(); -> enables cpu interrupt on CPU.SREG
+	//sei(); -> enables cpu interrupt on CPU.SREG - not necessary for polling
 }
 
 /*

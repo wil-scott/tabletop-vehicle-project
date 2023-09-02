@@ -14,6 +14,10 @@
 
 int main(void)
 {
+	//enable TWI pins for read/write -> relocate to separate config file in future
+	PORTA.DIR |= PIN2_bm;
+	PORTA.DIR |= PIN3_bm;
+	
 	SSD1306_init(0x78); // 
 	_delay_ms(20);
 	SSD1306_clear_display();

@@ -15,6 +15,7 @@ void SSD1306_init( uint8_t address )
 	_delay_ms(20); // delay to allow I2C device to turn on
 	i2c_init(SSD1306_I2C_ADDR); //init with standard OLED address 0x3C << 1
 	
+	//boot up sequence for SSD1306 via data sheet
 	const uint8_t initialize_OLED[27] = {
 		CMD_STREAM,
 		//SET GENERAL CMDS
