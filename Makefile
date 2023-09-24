@@ -24,6 +24,7 @@ LIB1=twi
 do: 
 	make twi.o 
 	make SSD1306.o 
+	make HCSR04.o
 	make $(TARGET).o
 	make library
 	make core
@@ -35,6 +36,9 @@ twi.o: $(LIBS_DIR)/twi.c
 SSD1306.o: $(SRC_DIR)/SSD1306.c
 	$(BIN_DIR)/$(CC) -c -g -Os -w -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=$(MCU) -DF_CPU=$(F_CPU) -I$(INC_DIR) $< -o $@
 
+HCSR04.o: $(SRC_DIR)/HCSR04.c
+	$(BIN_DIR)/$(CC) -c -g -Os -w -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=$(MCU) -DF_CPU=$(F_CPU) -I$(INC_DIR) $< -o $@
+
 $(TARGET).o: $(SRC_DIR)/$(TARGET).c
 	$(BIN_DIR)/$(CC) -c -g -Os -w -std=gnu11 -ffunction-sections -fdata-sections -MMD -flto -fno-fat-lto-objects -mmcu=$(MCU) -DF_CPU=$(F_CPU) -I$(LIBS_DIR) $< -o $@
 
@@ -42,6 +46,7 @@ library:
 	rm -f libmain.a
 	$(AVR_AR) rcs libmain.a twi.o
 	$(AVR_AR) rcs libmain.a SSD1306.o
+	$(AVR_AR) rcs libmain.a HCSR04.o
 
 core:
 	$(BIN_DIR)/$(CC) -w -Os -g -flto -Wl,--gc-sections -Wl,--section-start=.text=0x0 -mmcu=$(MCU) -Wl,-Map,avr.map -o $(TARGET).elf $(TARGET).o -L/home/wil/Workbench/autonomous-vehicle-project -lmain
