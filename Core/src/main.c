@@ -22,9 +22,10 @@ int main()
 	SSD1306_clear_display();
 	
 	int distance = measure();
+
 	
 	char row3[20];
-	sprintf(row2, "DISTANCE: %d mm", distance);
+	sprintf(row3, "DISTANCE: %d mm", distance);
 	display_string(row1, 18, 0x00, 0x00);
 	display_string(row3, 20, 0x01, 0x80);
 

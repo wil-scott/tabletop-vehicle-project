@@ -30,12 +30,10 @@ void pin_config()
 	DDRD &= ~(1<<PIND3); //input for echo
 	
 	//enable PCIE2 Bit2=1 for Port D
-	PCICR |= PCIE2; //0b00000100
+	PCICR |= 0x4 ; //0b00000100 or PCIE2
 	//ENABLE PCINT19 (PortD Pin 3)
-	PCMSK2 |= PCINT19; //0b00001000
-	
-	//configure timer
-	
+	PCMSK2 |= 0x8; //0b00001000 or PCINT19
+		
 }
 
 void timer_config()
@@ -80,10 +78,13 @@ int measure()
 	pin_config();
 	timer_config();
 	sei();
+	echo_pin_state = 0;
+	timeout = 0;
+	flag = 0;
 	trigger();
-	
-	while(!timeout || !flag) {}
-	
+
+	while(!flag) {}
+
 	if(timeout) {
 		return -1;
 	}
@@ -92,16 +93,19 @@ int measure()
 	int distance_mm = (microseconds/2) * speed_of_sound / 1000;
 	cli();
 	
-	return distance_mm;
+	return microseconds;
 	
 	
 }
 
 ISR(PCINT2_vect)
 {
+	//DDRB |= (1 << DDB1);
+   // PORTB |= (1 << PINB1);
 	//ISR for Port D
 	//if pin was low before state change
-	if (!echo_pin_state) {
+	if (echo_pin_state == 0) {
+
 		//set pin to current state (high)
 		echo_pin_state = 1;
 		//RESET timer
