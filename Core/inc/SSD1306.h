@@ -8,7 +8,7 @@
 #ifndef __SSD1306_I2C_DRIVER_H__
 #define __SSD1306_I2C_DRIVER_H__
 
-/* include HAL for ATMEGA4809 */
+/* include HAL for ATMEGA328p */
 #include <avr/io.h>
 #include "twi.h"
 #include "font6x8.h"
