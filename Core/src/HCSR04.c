@@ -16,6 +16,7 @@ volatile uint16_t end_time;
 volatile uint8_t flag = 0;
 volatile uint8_t timeout = 0;
 volatile uint8_t pin_state = 0;
+volatile uint8_t overflow = 0;
 
 void init_pins()
 {
@@ -32,8 +33,10 @@ void init_timer1()
 	
 	TCNT1 = 0;
 	TCCR1B = (1 << ICES1); //capture rising edge
-	TCCR1B |= 0x3; //set prescaler to 64
+	TCCR1B |= 0x4; //set prescaler to 64
+	//TCCR1B |= 0x01; // no prescaling, use 16MHz clock, 1 tick = 62.5 ns
 	TIMSK1 = (1 << ICIE1) | (1 << OCIE1A); // enable inp capt and comp int
+	//TIMSK1 = (1 << ICIE1) | (1 << )
 }
 
 void trigger()
@@ -71,6 +74,14 @@ ISR(TIMER1_CAPT_vect)
 		end_time = ICR1;
 		flag = 1;
 	}
+
+}
+
+/*
+ * Timer overflow necessary for 16Mhz non-prescaled timer
+ */
+ISR(TIMER1_OVF_vect)
+{
 
 }
 
