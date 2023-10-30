@@ -25,9 +25,9 @@ int main()
 
 	
 	char row3[20];
-	sprintf(row3, "DISTANCE: %d mm", distance);
+	sprintf(row3, "DISTANCE: %d cm", distance);
 	display_string(row1, 18, 0x00, 0x00);
-	display_string(row3, 20, 0x01, 0x80);
+	display_string(row3, 18, 0x01, 0x80);
 
 	while(1){}
 
