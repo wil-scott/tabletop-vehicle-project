@@ -19,6 +19,14 @@ volatile uint8_t timeout = 0;
 volatile uint8_t pin_state = 0;
 volatile uint8_t overflow = 0;
 
+void reset_values() {
+	end_time = 0;
+	flag = 0;
+	timeout = 0;
+	pin_state = 0;
+	overflow = 0;
+}
+
 void init_pins()
 {
 	//turn on HC-SR04 pins
@@ -32,11 +40,9 @@ void init_timer1()
 	TCCR1A = 0;
 	TCCR1B = 0;
 	
-	TCNT1 = 0;
+	TCNT1 = 0; // set timer to 0
 	TCCR1B = (1 << ICES1) | (1 << ICNC1); //capture rising edge
-	//TCCR1B |= 0x3; //set prescaler to 64
 	TCCR1B |= 0x01; // no prescaling, use 16MHz clock, 1 tick = 62.5 ns
-	//TIMSK1 = (1 << ICIE1) | (1 << OCIE1A); // enable inp capt and comp int
 	TIMSK1 = (1 << ICIE1) | (1 << TOIE1); // enable inp capt and overflow int
 }
 
@@ -52,6 +58,7 @@ void trigger()
 int measure()
 {
 	uint16_t ticks;
+	reset_values();
 	// clear interrupts
 	cli();
 	init_pins();
@@ -59,10 +66,15 @@ int measure()
 	sei();
 	trigger();
 	
-	while(!flag) {}
-	ticks = (overflow * 65536) + end_time;
-	int distance = (ticks*0.0000000625*34400)/2;
-	return distance;
+	while(!flag && !timeout) {}
+	if (!timeout) {
+		ticks = (overflow * 65536) + end_time;
+		int distance = (ticks*0.0000000625*34400)/2;
+		return distance;
+	} else {
+		return -1;
+	}
+
 }
 
 ISR(TIMER1_CAPT_vect)
@@ -70,14 +82,11 @@ ISR(TIMER1_CAPT_vect)
 	if (pin_state == 0) {
 		pin_state = 1;
 		TCNT1 = 0; // set timer to 0
-		//start_time = ICR1;
-		//OCR1A = timer1_compare_match;	// set compare val
 		TCCR1B &= ~(1 << ICES1); // set interrupt to falling edge
+		
 		
 	} else {
 		end_time = ICR1;
-		//end_time = (uint16_t) ICR1L;
-		//end_time |= (uint16_t) (ICR1H << 8);
 		flag = 1;
 	}
 
@@ -92,10 +101,11 @@ ISR(TIMER1_CAPT_vect)
 ISR(TIMER1_OVF_vect)
 {
 	overflow += 1;
+	
+	if (overflow == 10) { // if 10th overflow, timeout has already occurred
+		timeout = 1;
+	}
 }
 
-ISR(TIMER1_COMPA_vect)
-{
-	//ISR for Compare Match of Timer1
-	timeout = 1;
-}
+
+

@@ -21,14 +21,21 @@ int main()
 	_delay_ms(1000);
 	SSD1306_clear_display();
 	
-	int distance = measure();
 
-	
-	char row3[20];
-	sprintf(row3, "DISTANCE: %d cm", distance);
 	display_string(row1, 18, 0x00, 0x00);
-	display_string(row3, 18, 0x01, 0x80);
 
-	while(1){}
+
+	while(1){
+		int distance = measure();
+		if (distance == -1) {
+			char timeout[] = "DISTANCE: TIMEOUT";
+			display_string(timeout, 17, 0x01, 0x80);
+		
+		} else {
+			char row3[20];
+			sprintf(row3, "DISTANCE: %d cm", distance);
+			display_string(row3, 18, 0x01, 0x80);
+		}
+	}
 
 }
