@@ -1,13 +1,19 @@
 #AVR-GCC Tool Paths
-AVR_TOOLS_DIR=/home/wil/snap/arduino/71/.arduino15/packages/arduino/tools
-BIN_DIR=$(AVR_TOOLS_DIR)/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin
-AVRDUDE_DIR=$(AVR_TOOLS_DIR)/avrdude/6.3.0-arduino17
+#AVR_TOOLS_DIR=/home/wil/snap/arduino/71/.arduino15/packages/arduino/tools
+#BIN_DIR=$(AVR_TOOLS_DIR)/avr-gcc/7.3.0-atmel3.6.1-arduino5/bin
+#AVRDUDE_DIR=$(AVR_TOOLS_DIR)/avrdude/6.3.0-arduino17
 
 #AVR Toolchain
-CONFDIR?=$(AVRDUDE_DIR)/etc/avrdude.conf
-AVRDUDE=$(AVRDUDE_DIR)/bin/avrdude
-CC=$(BIN_DIR)/avr-gcc
-OBJCOPY=$(BIN_DIR)/avr-objcopy
+#CONFDIR?=$(AVRDUDE_DIR)/etc/avrdude.conf
+#AVRDUDE=$(AVRDUDE_DIR)/bin/avrdude
+#CC=$(BIN_DIR)/avr-gcc
+#OBJCOPY=$(BIN_DIR)/avr-objcopy
+
+# For compiling via pi
+CONFDIR=/etc/avrdude.conf
+AVRDUDE=avrdude
+CC=avr-gcc
+OBJCOPY=avr-objcopy
 
 # compiler-related vars
 TARGET=main
