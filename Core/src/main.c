@@ -1,6 +1,7 @@
 #include "../lib/twi.h"
 #include "../inc/SSD1306.h"
 #include "../inc/HCSR04.h"
+#include "../inc/dcm-driver.h"
 #include <stdio.h>
 
 int main()
@@ -23,7 +24,11 @@ int main()
 	
 
 	display_string(row1, 18, 0x00, 0x00);
-
+	
+	wheel_config();
+	drive_forward();
+	_delay_ms(5000);
+	drive_stop();
 
 	while(1){
 		int distance = measure();
@@ -36,6 +41,8 @@ int main()
 			sprintf(row3, "DISTANCE: %d cm", distance);
 			display_string(row3, 18, 0x01, 0x80);
 		}
+
+
 	}
 
 }
