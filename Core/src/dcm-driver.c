@@ -18,17 +18,21 @@ struct wheel rightWheel = { &PORTB, &DDRB, &PORTB, &DDRB, &PORTB, &DDRB };
 void wheel_config() {
 	/* setup Left Wheel - reset pin to low and direction to out*/
 	*leftWheel.speedPortReg &= ~(1 << PINB2); // pb2 is pwm pin - for now speed is either 0 (off) or 1 (on)
-	*leftWheel.speedDirectionReg |= (1 << PINB2);
-	*leftWheel.dir1PortReg &= ~(1 << PIND7);
-	*leftWheel.dir1DirectionReg |= (1 << PIND7);
-	*leftWheel.dir2PortReg &= ~(1 << PIND6);
-	*leftWheel.dir2DirectionReg |= (1 << PIND6);
-	/* setup Right Wheel - reset pin to low and direction to out*/
 	*rightWheel.speedPortReg &= ~(1 << PINB3);
-	*rightWheel.speedDirectionReg |= (1 << PINB3);
+
+	*leftWheel.dir1PortReg &= ~(1 << PIND7);
 	*rightWheel.dir1PortReg &= ~(1 << PINB5);
-	*rightWheel.dir1DirectionReg |= (1 << PINB5);
+
+	*leftWheel.dir2PortReg &= ~(1 << PIND6);
 	*rightWheel.dir2PortReg &= ~(1 << PINB4);
+
+	*leftWheel.speedDirectionReg |= (1 << PINB2);	
+	*rightWheel.speedDirectionReg |= (1 << PINB3);
+	
+	*leftWheel.dir1DirectionReg |= (1 << PIND7);
+	*rightWheel.dir1DirectionReg |= (1 << PINB5);
+
+	*leftWheel.dir2DirectionReg |= (1 << PIND6);
 	*rightWheel.dir2DirectionReg |= (1 << PINB4);
 }
 
@@ -38,8 +42,8 @@ void drive_forward() {
 	*leftWheel.dir2PortReg &= ~(1 << PIND6);
 
 	*rightWheel.speedPortReg |= (1 << PINB3);
-	*rightWheel.dir1PortReg |= (1 << PINB5);
-	*rightWheel.dir2PortReg &= ~(1 << PINB4);
+	*rightWheel.dir1PortReg &= ~(1 << PINB5);
+	*rightWheel.dir2PortReg |= (1 << PINB4);
 }
 
 
