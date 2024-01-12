@@ -6,13 +6,16 @@
 */
 
 #include "../inc/dcm-driver.h"
-#include "avr/interrupt.h"
 
 /* create wheel structs */
 struct wheel leftWheel = { &PORTD, &DDRD, &PORTB, &DDRB, &PORTB, &DDRB };
 struct wheel rightWheel = { &PORTD, &DDRD, &PORTB, &DDRB, &PORTB, &DDRB };
 
-double dutyCycle = 95.0;
+double dutyCycle = 100.0;
+// motors don't have enough juice if we start with a dutyCycle that's too low.
+// Solution: pulse high to start for ~400 cycles, then switch to desired dutyCycle via ISR 
+double desiredDutyCycle = 80.0;
+int counter = 0;
 
 /*
  * Set up pins for each wheel struct
@@ -95,8 +98,19 @@ void drive_stop() {
 	//stop the timer (turn off motors)
 	TCCR0B &= ~(1 << CS00);
 }
+
+void updateDutyCycle(double newDutyCycle) {
+	OCR0A = (newDutyCycle/100) * 255;
+	OCR0B = (newDutyCycle/100) * 255;
+}
 	
 ISR(TIMER0_OVF_vect)
 {
+	counter++;
+
+	if (counter == 400 && dutyCycle != desiredDutyCycle) {
+		dutyCycle = desiredDutyCycle;
+		updateDutyCycle(dutyCycle);
+	}
 }
 
