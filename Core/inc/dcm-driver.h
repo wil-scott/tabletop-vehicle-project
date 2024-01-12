@@ -9,7 +9,14 @@
 #define __DCM_DRIVER_H__
 
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
+// Duty Cycle variable - percentage out of 100% representing amount of time pins are high per period
+extern double dutyCycle;
+
+/*
+ * Create wheel struct for holding register locations for each motor/wheel
+ */
 struct wheel {
 	volatile uint8_t *speedPortReg;
 	volatile uint8_t *speedDirectionReg;
@@ -21,6 +28,8 @@ struct wheel {
 
 void wheel_config();
 void drive_forward();
+void drive_back();
+void turn();
 void drive_stop();
 
 #endif
