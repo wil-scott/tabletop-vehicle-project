@@ -10,6 +10,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 
 // Duty Cycle variable - percentage out of 100% representing amount of time pins are high per period
 extern double dutyCycle;

@@ -14,7 +14,8 @@ struct wheel rightWheel = { &PORTD, &DDRD, &PORTB, &DDRB, &PORTB, &DDRB };
 double dutyCycle = 100.0;
 // motors don't have enough juice if we start with a dutyCycle that's too low.
 // Solution: pulse high to start for ~400 cycles, then switch to desired dutyCycle via ISR 
-double desiredDutyCycle = 80.0;
+double startingDutyCycle = 100.0;
+double desiredDutyCycle = 95.0;
 int counter = 0;
 
 /*
@@ -64,7 +65,9 @@ void wheel_config() {
 
 
 void drive_forward() {
-	/* set up 8-bit timer for PWM to adjust drive speed */
+	/* reset global vars for juicing the motors appropriately */
+	counter = 0;
+	dutyCycle = startingDutyCycle;
 
 	//*leftWheel.speedPortReg |= (1 << PIND5);
 	*leftWheel.dir1PortReg |= (1 << PINB2);
@@ -79,11 +82,40 @@ void drive_forward() {
 }
 
 void drive_back() {
+	/* reset global vars for pumping up the motors appropriately */
+	counter = 0;
+	dutyCycle = startingDutyCycle;
 
+	/* reverse left wheel */
+	*leftWheel.dir1PortReg &= ~(1 << PINB2);
+	*leftWheel.dir2PortReg |= (1 << PINB3);
+
+	/* reverse right wheel */
+	*rightWheel.dir1PortReg |= (1 << PINB4);
+	*rightWheel.dir2PortReg &= ~(1 << PINB5);
+
+	/* Start timer */
+	TCCR0B = (1 << CS00);
 }
 
 void turn() {
+	/* Goal is to turn the vehicle ~90 degrees - for now, will use _delay_ms() to turn for period of time,
+	 * then disable motors. If this is to be made variable, will likely need to set up hardware timer */
 	
+	/* reset global vars for pumping up the motors appropriately */
+	counter = 0;
+	dutyCycle = startingDutyCycle;
+
+	/* left wheel forward */	
+	*leftWheel.dir1PortReg |= (1 << PINB2);
+	*leftWheel.dir2PortReg &= ~(1 << PINB3);
+
+	/* right wheel backward */
+	*rightWheel.dir1PortReg |= (1 << PINB4);
+	*rightWheel.dir2PortReg &= ~(1 << PINB5);
+
+	/* Start timer */
+	TCCR0B = (1 << CS00);
 }
 
 void drive_stop() {
@@ -108,7 +140,7 @@ ISR(TIMER0_OVF_vect)
 {
 	counter++;
 
-	if (counter == 400 && dutyCycle != desiredDutyCycle) {
+	if (counter == 500 && dutyCycle != desiredDutyCycle) {
 		dutyCycle = desiredDutyCycle;
 		updateDutyCycle(dutyCycle);
 	}

@@ -29,6 +29,12 @@ int main()
 	drive_forward();
 	_delay_ms(5000);
 	drive_stop();
+	drive_back();
+	_delay_ms(1000);
+	drive_stop();
+	turn();
+	_delay_ms(5000);
+	drive_stop();
 
 	while(1){
 		int distance = measure();
