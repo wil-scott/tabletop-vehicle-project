@@ -12,10 +12,12 @@ struct wheel leftWheel = { &PORTD, &DDRD, &PORTB, &DDRB, &PORTB, &DDRB };
 struct wheel rightWheel = { &PORTD, &DDRD, &PORTB, &DDRB, &PORTB, &DDRB };
 
 double dutyCycle = 100.0;
-// motors don't have enough juice if we start with a dutyCycle that's too low.
-// Solution: pulse high to start for ~400 cycles, then switch to desired dutyCycle via ISR 
+/* Motors don't have enough juice if we start with a dutyCycle that's too low.
+ * Solution: pulse high to start for ~400 cycles, then switch to desired dutyCycle via ISR
+ * Note: below ~85.0, 400 cycles is not enough.
+*/
 double startingDutyCycle = 100.0;
-double desiredDutyCycle = 95.0;
+double desiredDutyCycle = 90.0;
 int counter = 0;
 
 /*
@@ -65,17 +67,16 @@ void wheel_config() {
 
 
 void drive_forward() {
-	/* reset global vars for juicing the motors appropriately */
+	/* reset global vars for pumping up the motors appropriately */
 	counter = 0;
 	dutyCycle = startingDutyCycle;
 
-	//*leftWheel.speedPortReg |= (1 << PIND5);
 	*leftWheel.dir1PortReg |= (1 << PINB2);
 	*leftWheel.dir2PortReg &= ~(1 << PINB3);
 
-	//*rightWheel.speedPortReg |= (1 << PIND6);
 	*rightWheel.dir1PortReg &= ~(1 << PINB4);
 	*rightWheel.dir2PortReg |= (1 << PINB5);
+	
 	/* set prescaler to no prescaler */
 	/* this starts the timer */
 	TCCR0B = (1 << CS00);
@@ -99,8 +100,9 @@ void drive_back() {
 }
 
 void turn() {
-	/* Goal is to turn the vehicle ~90 degrees - for now, will use _delay_ms() to turn for period of time,
-	 * then disable motors. If this is to be made variable, will likely need to set up hardware timer */
+	/* Goal is to turn the vehicle ~90 degrees, but to do so requires specific timing. If timing is done within driver/function,	 * would require hardware interrupt to set up appropriately. For now, turn duration will be controlled in 
+	 * external application (main.c)
+	 */
 	
 	/* reset global vars for pumping up the motors appropriately */
 	counter = 0;
@@ -119,11 +121,10 @@ void turn() {
 }
 
 void drive_stop() {
-	//*leftWheel.speedPortReg &= ~(1 << PIND5);
+	/* set all direction pins to low, stop timer */
 	*leftWheel.dir1PortReg &= ~(1 << PINB2);
 	*leftWheel.dir2PortReg &= ~(1 << PINB3);
 
-	//*rightWheel.speedPortReg &= ~(1 << PIND6);
 	*rightWheel.dir1PortReg &= ~(1 << PINB4);
 	*rightWheel.dir2PortReg &= ~(1 << PINB5);
 	
@@ -132,15 +133,18 @@ void drive_stop() {
 }
 
 void updateDutyCycle(double newDutyCycle) {
+	/* Update timer comparison registers based on newDutyCycle */
 	OCR0A = (newDutyCycle/100) * 255;
 	OCR0B = (newDutyCycle/100) * 255;
 }
 	
 ISR(TIMER0_OVF_vect)
 {
+	/* ISR could be empty, but usage is necessary if we want to control speed (aside from 0 or 1)
+	 * We count cycles while dutyCycle is 100%, then after sufficient time for motors to get the juice they
+	 * need to run, we update the duty cycle to desired value */
 	counter++;
-
-	if (counter == 500 && dutyCycle != desiredDutyCycle) {
+	if (counter == 400 && dutyCycle != desiredDutyCycle) {
 		dutyCycle = desiredDutyCycle;
 		updateDutyCycle(dutyCycle);
 	}
