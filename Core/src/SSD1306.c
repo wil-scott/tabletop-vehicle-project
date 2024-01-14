@@ -7,6 +7,10 @@
 
 #include "../inc/SSD1306.h"
 
+
+/*
+ * Configure OLED screen
+*/
 void SSD1306_init( uint8_t address )
 {
 	_delay_ms(20); // delay to allow I2C device to turn on
@@ -54,6 +58,10 @@ void SSD1306_init( uint8_t address )
 	
 }
 
+
+/*
+ * Set, or reset, the location of the cursor on the OLED Screen.
+*/
 void set_cursor(uint8_t col_min, uint8_t col_max, uint8_t page_min, uint8_t page_max)
 {
 	const uint8_t arr[7] = {	
@@ -69,6 +77,10 @@ void set_cursor(uint8_t col_min, uint8_t col_max, uint8_t page_min, uint8_t page
 	i2c_write_array(arr, 7);
 }
 
+
+/*
+ * Clear display by writing empty bits/bytes to each location.
+*/
 void SSD1306_clear_display()
 {
 
@@ -81,8 +93,11 @@ void SSD1306_clear_display()
 	i2c_stop();			
 }
 
+
 /*
- * STRING TO DISPLAY
+ * Take input string, and intended location (page, column), and write to OLED.
+ * Used loop to iterate through each char in string, conver to ASCII value, and determine location
+ * of ASCII value in font array. Iterates through each byte of the ASCII value and writes it to the display.
  */
 void display_string(char* string, int str_len, uint8_t page, uint8_t col )
 {
@@ -108,8 +123,9 @@ void display_string(char* string, int str_len, uint8_t page, uint8_t col )
 
 }
 
+
 /*
- * LOW-LEVEL FUNCTIONS
+ * Write single Command or Data byte to the OLED.
  */
 void SSD1306_WriteCommand( uint8_t byte )
 {

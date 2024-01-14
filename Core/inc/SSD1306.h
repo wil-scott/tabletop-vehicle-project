@@ -24,7 +24,15 @@
 #define MIN_PAGE 	0
 #define MAX_PAGE 	3
 
- 
+/* define commonly used page numbers and columns */
+#define PAGE_ZERO	0x00
+#define PAGE_ONE	0x01
+#define PAGE_TWO	0x02
+#define PAGE_THREE	0x03
+
+#define PAGE_ZERO_COL_START	0x00
+#define PAGE_ONE_COL_START	0x80
+
 /* define control bytes */
 /* Control byte: C D/C 0 0 0 0 0 0
  * C = 0, then the following transmission is data bytes only
