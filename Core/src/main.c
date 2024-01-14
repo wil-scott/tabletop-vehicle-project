@@ -29,20 +29,12 @@ int car_drive_forward(int driving)
 }
 
 
-int car_stop()
-{
-	// stop vehicle
-	drive_stop();
-	return 0;
-}
-
-
 int main()
 {
 	int distance;
 	int driving = 0; // 0 means not driving forward, 1 means driving forward
 	char row1[20]; // STATUS: XYZ
-	char row2[16]; // DISTANCE: Xcm
+	char row2[20]; // DISTANCE: Xcm
 	
 	init_oled();
 	wheel_config();
@@ -56,13 +48,13 @@ int main()
 			// approximate distance between HCSR04 and bottom of front wheel: ~4cm
 			driving = car_drive_forward(driving);
 		} else if (distance > 5) {
-			driving = car_stop();
+			driving = drive_stop();
 			drive_back();
 			_delay_ms(250);
-			driving = car_stop();
+			driving = drive_stop();
 			turn();
 			_delay_ms(400);
-			driving = car_stop();
+			driving = drive_stop();
 		}
 	}
 

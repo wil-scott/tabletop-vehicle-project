@@ -120,7 +120,7 @@ void turn() {
 	TCCR0B = (1 << CS00);
 }
 
-void drive_stop() {
+int drive_stop() {
 	/* set all direction pins to low, stop timer */
 	*leftWheel.dir1PortReg &= ~(1 << PINB2);
 	*leftWheel.dir2PortReg &= ~(1 << PINB3);
@@ -130,6 +130,8 @@ void drive_stop() {
 	
 	//stop the timer (turn off motors)
 	TCCR0B &= ~(1 << CS00);
+
+	return 0;
 }
 
 void updateDutyCycle(double newDutyCycle) {

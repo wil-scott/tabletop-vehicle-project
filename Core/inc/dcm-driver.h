@@ -31,6 +31,6 @@ void wheel_config();
 void drive_forward();
 void drive_back();
 void turn();
-void drive_stop();
+int drive_stop();
 
 #endif
