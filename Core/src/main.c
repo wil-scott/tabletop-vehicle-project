@@ -4,7 +4,6 @@
 #include "../inc/dcm-driver.h"
 
 
-
 void init_oled()
 {
 	SSD1306_init( SSD1306_I2C_ADDR );
@@ -12,17 +11,9 @@ void init_oled()
 	char row1[] = "STATUS: FUNCTIONAL";
 	char row2[] = "DISTANCE: NULL";
 
-	display_string(row1, 18, 0x00, 0x00);
-	display_string(row2, 14, 0x01, 0x80);
+	display_string(row1, 18, PAGE_ZERO, PAGE_ZERO_COL_START);
+	display_string(row2, 14, PAGE_ONE, PAGE_ONE_COL_START);
 }	
-
-
-void init_twi_pins() 
-{
-	//turn on TWI pins
-	DDRC |= (1<<PINC4);
-	DDRC |= (1<<PINC5);
-}
 
 
 /* if table surface detected, drive forward. 
@@ -53,7 +44,6 @@ int main()
 	char row1[20]; // STATUS: XYZ
 	char row2[16]; // DISTANCE: Xcm
 	
-	init_twi_pins();
 	init_oled();
 	wheel_config();
 	/* Logic: While the distance sensor detects a table surface, drive forward. When no surface is detected

@@ -14,8 +14,13 @@ static uint8_t rec_address;
 // Status Codes - TWSR - Master Mode
 enum { START = 0x08, REPEAT_START = 0X10, SLAW_ACK = 0x18, SLAW_NACK = 0x20, DATA_ACK = 0x28, DATA_NACK = 0x30, ARB_LOST = 0x38 };
 
+
 void twi_init(void) 
 {
+	//turn on TWI pins
+	DDRC |= (1<<PINC4);
+	DDRC |= (1<<PINC5);
+
 	// SCL Freq = CPU Freq/(16 + 2(TWBR)*(prescaler value))
 	// prescaler val = 1 (TWSR bit 0,1 are set to 0, 0)'
 	// TWBR = 0x48 (decimal 72)
@@ -23,8 +28,8 @@ void twi_init(void)
 	TWSR &= ~1; //0000 0001 -> 1111 1110
 	TWSR &= ~(1<<1); //0000 0010 -> 1111 1101
 	TWBR = 0x48;
-	//sei();
 }
+
 
 //  Send START via TWCR register
 //	Wait for TWINT flag set in TWCR
@@ -38,20 +43,13 @@ void twi_start()
 	
 	while (!(TWCR & (1<<TWINT))) {}
 	
-/*	if ((TWSR & 0xF8) != START) {*/
-/*		return;*/
-/*	}*/
-	
 	TWDR = rec_address;
 	TWCR = (1<<TWINT) | (1<<TWEN);
 	
 	while (!(TWCR & (1<<TWINT))) {}
 	
-/*	if ((TWSR & 0xF8) != SLAW_ACK) {*/
-/*		return;*/
-/*	}*/
-	
 }
+
 
 //	check val of TWI Status Reg - mask prescaler bits - for MT_SLA_ACK
 //	Load DATA into TDWR Register
@@ -64,11 +62,8 @@ void twi_write(uint8_t data)
 	TWCR = (1<<TWINT) | (1<<TWEN);
 	
 	while (!(TWCR & (1<<TWINT))) {}
-	
-/*	if ((TWSR & 0xF8) != DATA_ACK) {*/
-/*		return;*/
-/*	}*/
 }
+
 
 //	Transmit STOP
 void twi_stop()
@@ -86,11 +81,13 @@ void set_address(uint8_t addr)
 	rec_address = addr;
 }
 
+
 void i2c_init(uint8_t addr)
 {
 	rec_address = addr;
 	twi_init();
 }
+
 
 void i2c_write_array(const uint8_t* data_buffer, int data_size)
 {
@@ -102,21 +99,21 @@ void i2c_write_array(const uint8_t* data_buffer, int data_size)
 	twi_stop();
 }
 
+
 void i2c_start()
 {
 	twi_start();
 }
+
 
 void i2c_write(uint8_t data)
 {
 	twi_write(data);
 }
 
+
 void i2c_stop()
 {
 	twi_stop();
 }
-
-
-
 
