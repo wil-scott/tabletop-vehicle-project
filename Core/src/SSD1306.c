@@ -93,6 +93,21 @@ void SSD1306_clear_display()
 	i2c_stop();			
 }
 
+/*
+ * Clear single page of display
+*/
+void SSD1306_clear_page(uint8_t target_page)
+{
+	set_cursor(0x00, 0x7F, target_page, target_page);
+
+	i2c_start();
+	i2c_write(DATA_STREAM);
+	for (int col = 0; col < 128; col++) {
+		i2c_write(0x00);
+	}
+	i2c_stop();
+}
+
 
 /*
  * Take input string, and intended location (page, column), and write to OLED.
@@ -102,7 +117,7 @@ void SSD1306_clear_display()
 void display_string(char* string, int str_len, uint8_t page, uint8_t col )
 {
 
-	set_cursor(col, 0x7F, page, 0x03);
+	set_cursor(col, 0x7F, page, MAX_PAGE);
 	
 	i2c_start();
 	i2c_write(DATA_STREAM);

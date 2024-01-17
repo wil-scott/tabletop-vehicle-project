@@ -22,7 +22,10 @@
 #define HEIGHT 		32
 #define WIDTH 		128
 #define MIN_PAGE 	0
-#define MAX_PAGE 	3
+#define MAX_PAGE 	0x03
+
+#define PAGE_ZERO_MIN_COL	0x00
+#define PAGE_ZERO_MAX_COL	0x7F
 
 /* define commonly used page numbers and columns */
 #define PAGE_ZERO	0x00
@@ -30,8 +33,11 @@
 #define PAGE_TWO	0x02
 #define PAGE_THREE	0x03
 
-#define PAGE_ZERO_COL_START	0x00
-#define PAGE_ONE_COL_START	0x80
+#define PAGE_ZERO_MIN_COL	0x00
+#define PAGE_ZERO_MAX_COL	0x7F
+#define PAGE_ONE_MIN_COL	0x80
+#define PAGE_ONE_MAX_COL	0xFE
+
 
 /* define control bytes */
 /* Control byte: C D/C 0 0 0 0 0 0
@@ -110,6 +116,8 @@ void SSD1306_clear_display();
 void display_string(char* string, int str_len, uint8_t page, uint8_t col );
 void SSD1306_scroll_off();
 //void set_cursor(uint8_t col_min, uint8_t col_max, uint8_t page_min, uint8_t page_max);
+void SSD1306_clear_page(uint8_t target_page);
+
 
 /*
  * LOW-LEVEL FUNCTIONS

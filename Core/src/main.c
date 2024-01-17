@@ -2,30 +2,102 @@
 #include "../inc/SSD1306.h"
 #include "../inc/HCSR04.h"
 #include "../inc/dcm-driver.h"
+#include <string.h>
+#include <stdio.h>
 
 
 void init_oled()
 {
 	SSD1306_init( SSD1306_I2C_ADDR );
 	SSD1306_clear_display();
-	char row1[] = "STATUS: FUNCTIONAL";
-	char row2[] = "DISTANCE: NULL";
-
-	display_string(row1, 18, PAGE_ZERO, PAGE_ZERO_COL_START);
-	display_string(row2, 14, PAGE_ONE, PAGE_ONE_COL_START);
 }	
+
+
+int number_of_digits(int num)
+{
+	int count = 0;
+	
+	if (num == 0) { return 1; }
+
+	while (num != 0) {
+		num = num / 10;
+		count++;
+	}
+
+	return count;
+}
+
+
+void update_distance(int distance)
+{
+	char *distance_str;
+	int str_len = strlen("DISTANCE: ") ;
+	int digits_len = number_of_digits(distance);
+	int total_len = str_len + digits_len;
+	
+	distance_str = malloc(total_len);
+	sprintf(distance_str, "DISTANCE: %d", distance);
+
+	SSD1306_clear_page(PAGE_ONE);
+	display_string(distance_str, total_len, PAGE_ONE, PAGE_ONE_MIN_COL);
+	free(distance_str);
+}
 
 
 /* if table surface detected, drive forward. 
  * If already driving forward, return 1 and do nothing
  * If not already driving, start driving and return 1
 */
-int car_drive_forward(int driving)
+int car_forward(int driving)
 {
+	// update display
+	char driving_str[] = "STATUS: DRIVING";
+	int str_len = strlen(driving_str) ;
+
 	if (!driving) {
 		drive_forward();		
 	}
+	
+	SSD1306_clear_page(PAGE_ZERO);
+	display_string(driving_str, str_len, PAGE_ZERO, PAGE_ZERO_MIN_COL);
+	
+	// update driving status/flag
 	return 1;
+}
+
+
+void car_backward()
+{
+	char driving_str[] = "STATUS: REVERSING";
+	int str_len = strlen(driving_str) ;
+
+	drive_back();
+	SSD1306_clear_page(PAGE_ZERO);
+	display_string(driving_str, str_len, PAGE_ZERO, PAGE_ZERO_MIN_COL);
+}
+
+
+int car_stop()
+{
+	char driving_str[] = "STATUS: STOPPED";
+	int str_len = strlen(driving_str) ;
+	int return_value;
+	
+	return_value = drive_stop();
+	SSD1306_clear_page(PAGE_ZERO);
+	display_string(driving_str, str_len, PAGE_ZERO, PAGE_ZERO_MIN_COL);
+	return return_value;
+}
+
+
+void car_turn()
+{
+	char driving_str[] = "STATUS: TURNING";
+	int str_len = strlen(driving_str) ;
+
+	turn();
+	SSD1306_clear_page(PAGE_ZERO);
+	display_string(driving_str, str_len, PAGE_ZERO, PAGE_ZERO_MIN_COL);
 }
 
 
@@ -33,8 +105,6 @@ int main()
 {
 	int distance;
 	int driving = 0; // 0 means not driving forward, 1 means driving forward
-	char row1[20]; // STATUS: XYZ
-	char row2[20]; // DISTANCE: Xcm
 	
 	init_oled();
 	wheel_config();
@@ -46,16 +116,17 @@ int main()
 		distance = measure();
 		if (distance <= 5) {
 			// approximate distance between HCSR04 and bottom of front wheel: ~4cm
-			driving = car_drive_forward(driving);
+			driving = car_forward(driving);
 		} else if (distance > 5) {
-			driving = drive_stop();
-			drive_back();
+			driving = car_stop();
+			car_backward();
 			_delay_ms(250);
-			driving = drive_stop();
-			turn();
+			driving = car_stop();
+			car_turn();
 			_delay_ms(400);
-			driving = drive_stop();
+			driving = car_stop();
 		}
+		update_distance(distance);
 	}
 
 //	wheel_config();
