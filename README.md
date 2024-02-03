@@ -1,4 +1,4 @@
-# Table-Top Autonomous Vehicle with Arduino Uno/ATmega328P
+# Table-Top Vehicle with Arduino Uno/ATmega328P
 Welcome to my Table-Top Vehicle project, a bare-metal C implementation for creating a self-navigating vehicle using an Arduino Uno with the ATMEGA328P microcontroller. This project incorporates an SSD1306 OLED screen, an HC-SR04 ultrasonic sensor, and two DC motors driven by an L293D module for movement.
 
 After finalizing the driver for the DC Motors/L293D module and constructing a DIY car chassis, the project has hit a tipping point: a functional prototype!
